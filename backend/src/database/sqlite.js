@@ -7,15 +7,14 @@ export async function connectDB() {
     driver: sqlite3.Database,
   });
 
+  // Create table if it does not exist
   await db.exec(`
     CREATE TABLE IF NOT EXISTS journals (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      userId TEXT,
-      ambience TEXT,
       text TEXT,
       emotion TEXT,
-      summary TEXT,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      confidence REAL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 

@@ -5,13 +5,16 @@ import {
   getJournals,
   analyzeJournal,
   getInsights,
+  getTrends,
 } from "../controllers/journalController.js";
 
 const router = express.Router();
 
 router.post("/", createJournal);
-router.get("/:userId", getJournals);
 router.post("/analyze", analyzeJournal);
-router.get("/insights/:userId", getInsights);
+
+router.get("/journals", getJournals);
+router.get("/insights", getInsights);
+router.get("/trends", getTrends);
 
 export default router;
