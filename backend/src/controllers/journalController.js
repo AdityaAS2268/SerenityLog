@@ -55,6 +55,12 @@ export const analyzeJournal = async (req, res) => {
 
     const db = await connectDB();
 
+    if (!req.body?.text) {
+      return res.status(400).json({
+        error: "Journal text is required",
+      });
+    }
+
     await db.run(
       `INSERT INTO journals (text, emotion, confidence)
        VALUES (?, ?, ?)`,
