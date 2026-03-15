@@ -85,5 +85,34 @@ export const analyzeJournal = async (req, res) => {
 };
 
 export const getInsights = async (req, res) => {
-  res.json({ message: "Insights endpoint coming next" });
+  try {
+    const db = await connectDB();
+
+    // Get latest journal entry
+    const journal = await db.get(
+      `SELECT text, emotion FROM journals ORDER BY created_at DESC LIMIT 1`,
+    );
+
+    if (!journal) {
+      return res.json({
+        message: "No journal entries yet",
+      });
+    }
+
+    // Generate insight using Gemini
+    const insightResult = await generateInsight(journal.text, journal.emotion);
+
+    res.json({
+      text: journal.text,
+      emotion: journal.emotion,
+      insight: insightResult.insight,
+      suggestion: insightResult.suggestion,
+    });
+  } catch (error) {
+    console.error("Insights error:", error);
+
+    res.status(500).json({
+      error: "Insight generation failed",
+    });
+  }
 };
