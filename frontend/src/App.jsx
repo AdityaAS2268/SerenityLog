@@ -6,6 +6,7 @@ import Insights from "./components/Insights";
 import EmotionTrendChart from "./components/EmotionTrendChart";
 
 import "./App.css";
+import EmotionTimeline from "./components/EmotionTimeline";
 
 function App() {
   const [result, setResult] = useState(null);
@@ -24,6 +25,10 @@ function App() {
 
       <div className="card">
         <Insights />
+      </div>
+
+      <div className="card">
+        <EmotionTimeline />
       </div>
 
       <div className="card">

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function JournalForm({ setResult }) {
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {
     if (!text.trim()) {
@@ -10,6 +11,8 @@ function JournalForm({ setResult }) {
     }
 
     try {
+      setLoading(true); // start loading
+
       const response = await fetch(
         "http://localhost:5000/api/journal/analyze",
         {
@@ -23,9 +26,11 @@ function JournalForm({ setResult }) {
 
       const data = await response.json();
 
-      setResult(data); // send result to parent component
+      setResult(data);
     } catch (error) {
       console.error("Error analyzing journal:", error);
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
@@ -41,7 +46,11 @@ function JournalForm({ setResult }) {
 
       <br />
 
-      <button onClick={handleAnalyze}>Analyze Emotion</button>
+      <button onClick={handleAnalyze} disabled={loading || !text.trim()}>
+        {loading ? "Analyzing..." : "Analyze Emotion"}
+      </button>
+
+      {loading && <p>⏳ AI is analyzing your emotions...</p>}
     </div>
   );
 }

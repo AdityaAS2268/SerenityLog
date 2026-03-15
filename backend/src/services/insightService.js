@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 import { getEmotionTrends } from "./trendService.js";
+import redisClient from "../cache/redisClient.js";
 
 dotenv.config();
 
@@ -8,6 +9,25 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const generateInsight = async (text = null, emotion = null) => {
   try {
+    let cacheKey;
+
+    // -------- MODE 1: Single Journal Entry Insight --------
+    if (text && emotion) {
+      cacheKey = `insight:${text}`;
+    }
+
+    // -------- MODE 2: Overall Emotional Trends Insight --------
+    else {
+      cacheKey = "insight:trends";
+    }
+
+    // 1️⃣ Check Redis Cache
+    const cachedInsight = await redisClient.get(cacheKey);
+
+    if (cachedInsight) {
+      return JSON.parse(cachedInsight);
+    }
+
     const model = genAI.getGenerativeModel({
       model: "gemini-3.1-flash-lite-preview",
     });
@@ -39,7 +59,7 @@ Return ONLY JSON:
 `;
     }
 
-    // -------- MODE 2: Overall Emotional Trends Insight --------
+    // -------- MODE 2: Emotional Trends Insight --------
     else {
       const trends = await getEmotionTrends();
 
@@ -72,7 +92,12 @@ Return ONLY JSON:
 
     const jsonString = outputText.replace(/```json|```/g, "").trim();
 
-    return JSON.parse(jsonString);
+    const insightData = JSON.parse(jsonString);
+
+    // 2️⃣ Save result to Redis cache (10 minutes)
+    await redisClient.setEx(cacheKey, 600, JSON.stringify(insightData));
+
+    return insightData;
   } catch (error) {
     console.error("Insight generation error:", error);
     throw new Error("Insight generation failed");
