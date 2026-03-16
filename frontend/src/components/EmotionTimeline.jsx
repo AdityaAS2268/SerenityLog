@@ -5,36 +5,35 @@ function EmotionTimeline() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/journal/timeline")
-      .then((res) => res.json())
-      .then((rows) => {
-        const grouped = {};
+    const fetchData = () => {
+      fetch(`${import.meta.env.VITE_API_URL}/api/journal/timeline`)
+        .then((res) => res.json())
+        .then((rows) => {
+          const labels = rows.map((r) =>
+            new Date(r.created_at).toLocaleDateString(),
+          );
 
-        rows.forEach((r) => {
-          const date = new Date(r.created_at).toLocaleDateString();
+          const emotions = rows.map((r) => r.emotion);
 
-          if (!grouped[date]) {
-            grouped[date] = 0;
-          }
-
-          grouped[date] += 1;
+          setData({
+            labels,
+            datasets: [
+              {
+                label: "Emotion Timeline",
+                data: emotions.map((_, i) => i + 1),
+                borderColor: "#4CAF50",
+                tension: 0.4,
+              },
+            ],
+          });
         });
+    };
 
-        const labels = Object.keys(grouped);
-        const values = Object.values(grouped);
+    fetchData();
 
-        setData({
-          labels,
-          datasets: [
-            {
-              label: "Emotion Timeline",
-              data: values,
-              borderColor: "#4CAF50",
-              tension: 0.4,
-            },
-          ],
-        });
-      });
+    const interval = setInterval(fetchData, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (!data) return <p>Loading timeline...</p>;
