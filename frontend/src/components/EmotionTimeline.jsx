@@ -8,18 +8,27 @@ function EmotionTimeline() {
     fetch("http://localhost:5000/api/journal/timeline")
       .then((res) => res.json())
       .then((rows) => {
-        const labels = rows.map((r) =>
-          new Date(r.created_at).toLocaleDateString(),
-        );
+        const grouped = {};
 
-        const emotions = rows.map((r) => r.emotion);
+        rows.forEach((r) => {
+          const date = new Date(r.created_at).toLocaleDateString();
+
+          if (!grouped[date]) {
+            grouped[date] = 0;
+          }
+
+          grouped[date] += 1;
+        });
+
+        const labels = Object.keys(grouped);
+        const values = Object.values(grouped);
 
         setData({
           labels,
           datasets: [
             {
               label: "Emotion Timeline",
-              data: emotions.map((_, i) => i + 1),
+              data: values,
               borderColor: "#4CAF50",
               tension: 0.4,
             },
