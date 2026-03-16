@@ -6,3 +6,4 @@ backend/.env
 dist
 build
 *.log
+journal.db
