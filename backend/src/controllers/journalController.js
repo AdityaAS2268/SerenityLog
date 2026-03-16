@@ -93,8 +93,8 @@ export const analyzeJournal = async (req, res) => {
       [text, emotionResult.emotion, emotionResult.confidence],
     );
 
-    // 3️⃣ Store full result in Redis (10 minutes)
-    await redisClient.setEx(cacheKey, 600, JSON.stringify(result));
+    // 3️⃣ Store full result in Redis (30 minutes)
+    await redisClient.setEx(cacheKey, 1800, JSON.stringify(result));
 
     // 4️⃣ Clear trends cache
     await redisClient.del("emotion_trends");
