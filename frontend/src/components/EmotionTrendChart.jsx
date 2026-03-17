@@ -28,6 +28,12 @@ function EmotionTrendChart() {
     fetch(`${import.meta.env.VITE_API_URL}/api/journal/trends`)
       .then((res) => res.json())
       .then((data) => {
+        // 🚨 HANDLE ERROR RESPONSE
+        if (!data || !data.emotionCounts) {
+          console.error("Invalid trends data:", data);
+          return;
+        }
+
         const emotions = Object.keys(data.emotionCounts);
         const counts = Object.values(data.emotionCounts);
 
@@ -47,6 +53,9 @@ function EmotionTrendChart() {
             },
           ],
         });
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
       });
   }, []);
 

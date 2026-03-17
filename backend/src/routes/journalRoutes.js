@@ -5,7 +5,7 @@ import {
   getJournals,
   analyzeJournal,
   getInsights,
-  getTrends,
+  getEmotionTrends,
   getEmotionTimeline,
 } from "../controllers/journalController.js";
 
@@ -16,7 +16,7 @@ router.post("/analyze", analyzeJournal);
 
 router.get("/journals", getJournals);
 router.get("/insights", getInsights);
-router.get("/trends", getTrends);
+router.get("/trends", getEmotionTrends);
 router.get("/timeline", getEmotionTimeline);
 
 export default router;
