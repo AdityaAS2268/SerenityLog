@@ -25,7 +25,7 @@ function EmotionTrendChart() {
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/journal/trends")
+    fetch(`${import.meta.env.VITE_API_URL}/api/journal/trends`)
       .then((res) => res.json())
       .then((data) => {
         const emotions = Object.keys(data.emotionCounts);

@@ -4,7 +4,7 @@ function Insights() {
   const [insights, setInsights] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/journal/insights")
+    fetch(`${import.meta.env.VITE_API_URL}/api/journal/timeline`)
       .then((res) => res.json())
       .then((data) => setInsights(data));
   }, []);

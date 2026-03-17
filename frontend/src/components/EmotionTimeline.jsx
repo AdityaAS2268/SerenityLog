@@ -5,7 +5,7 @@ function EmotionTimeline() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/journal/timeline")
+    fetch(`${import.meta.env.VITE_API_URL}/api/journal/timeline`)
       .then((res) => res.json())
       .then((rows) => {
         const grouped = {};
