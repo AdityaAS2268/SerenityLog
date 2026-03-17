@@ -1,14 +1,14 @@
 import { connectDB } from "../database/sqlite.js";
 import { analyzeEmotion } from "../services/geminiService.js";
 import { generateInsight } from "../services/insightService.js";
-import { getEmotionTrends } from "../services/trendService.js";
 import redisClient from "../cache/redisClient.js";
 
 export const getEmotionTrends = async (req, res) => {
   try {
-    const rows = await getJournalsFromDB(); // or your DB query
+    const db = await connectDB();
 
-    // ✅ FIX 1: handle empty DB
+    const rows = await db.all(`SELECT emotion FROM journals`);
+
     if (!rows || rows.length === 0) {
       return res.json({ emotionCounts: {} });
     }
@@ -24,8 +24,6 @@ export const getEmotionTrends = async (req, res) => {
     res.json({ emotionCounts });
   } catch (error) {
     console.error("Trend error:", error);
-
-    // ✅ FIX 2: never send error response structure
     res.json({ emotionCounts: {} });
   }
 };
