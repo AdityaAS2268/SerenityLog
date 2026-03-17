@@ -4,18 +4,28 @@ import { generateInsight } from "../services/insightService.js";
 import { getEmotionTrends } from "../services/trendService.js";
 import redisClient from "../cache/redisClient.js";
 
-export const getTrends = async (req, res) => {
+export async function getEmotionTrends(req, res) {
   try {
-    const trends = await getEmotionTrends();
-    res.json(trends);
-  } catch (error) {
-    console.error(error);
+    const db = await connectDB();
 
-    res.status(500).json({
-      error: "Trend analysis failed",
+    const rows = await db.all(`
+      SELECT emotion, COUNT(*) as count
+      FROM journals
+      GROUP BY emotion
+    `);
+
+    const emotionCounts = {};
+
+    rows.forEach((row) => {
+      emotionCounts[row.emotion] = row.count;
     });
+
+    res.json({ emotionCounts });
+  } catch (err) {
+    console.error("Trend error:", err);
+    res.status(500).json({ error: "Trend analysis failed" });
   }
-};
+}
 
 export const createJournal = async (req, res) => {
   try {
