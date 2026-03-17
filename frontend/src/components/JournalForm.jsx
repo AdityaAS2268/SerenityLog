@@ -14,7 +14,7 @@ function JournalForm({ setResult }) {
       setLoading(true); // start loading
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/journal/timeline`,
+        `${import.meta.env.VITE_API_URL}/api/journal/analyze`,
         {
           method: "POST",
           headers: {
