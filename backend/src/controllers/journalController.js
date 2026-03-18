@@ -69,6 +69,8 @@ export const analyzeJournal = async (req, res) => {
   try {
     const { text } = req.body;
 
+    console.log("Text Received: ", text);
+
     if (!text || text.length < 5) {
       return res.status(400).json({
         error: "Journal entry must contain at least 5 characters",
@@ -86,6 +88,8 @@ export const analyzeJournal = async (req, res) => {
 
     // 2️⃣ If cache miss → call Gemini
     const emotionResult = await analyzeEmotion(text);
+
+    console.log("Emotion: ", emotionResult);
 
     const insightResult = await generateInsight(text, emotionResult.emotion);
 
