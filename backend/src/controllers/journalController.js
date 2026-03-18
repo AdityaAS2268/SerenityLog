@@ -79,8 +79,12 @@ export const analyzeJournal = async (req, res) => {
 
     const cacheKey = `analysis:${text}`;
 
-    // 1️⃣ Check Redis cache
-    const cachedResult = await redisClient.get(cacheKey);
+    let cachedResult = null;
+
+    if (redisClient) {
+      // 1️⃣ Check Redis cache
+      cachedResult = await redisClient.get(cacheKey);
+    }
 
     if (cachedResult) {
       return res.json(JSON.parse(cachedResult));
@@ -108,11 +112,15 @@ export const analyzeJournal = async (req, res) => {
       [text, emotionResult.emotion, emotionResult.confidence],
     );
 
-    // 3️⃣ Store full result in Redis (30 minutes)
-    await redisClient.setEx(cacheKey, 1800, JSON.stringify(result));
+    if (redisClient) {
+      // 3️⃣ Store full result in Redis (30 minutes)
+      await redisClient.setEx(cacheKey, 1800, JSON.stringify(result));
+    }
 
-    // 4️⃣ Clear trends cache
-    await redisClient.del("emotion_trends");
+    if (redisClient) {
+      // 4️⃣ Clear trends cache
+      await redisClient.del("emotion_trends");
+    }
 
     res.json(result);
   } catch (error) {
