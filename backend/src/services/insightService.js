@@ -94,9 +94,21 @@ Return ONLY JSON:
     const response = await result.response;
     const outputText = response.text();
 
-    const jsonString = outputText.replace(/```json|```/g, "").trim();
+    let insightData;
 
-    const insightData = JSON.parse(jsonString);
+    try {
+      const cleaned = outputText.replace(/```json|```/g, "").trim();
+
+      insightData = JSON.parse(cleaned);
+    } catch (err) {
+      console.error("JSON parse failed. Raw output:", outputText);
+
+      // fallback so app doesn't crash
+      insightData = {
+        insight: "Could not generate insight",
+        suggestion: "Try writing again",
+      };
+    }
 
     if (redisClient) {
       // 2️⃣ Save result to Redis cache (10 minutes)
