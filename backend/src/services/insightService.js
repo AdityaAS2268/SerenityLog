@@ -21,8 +21,12 @@ export const generateInsight = async (text = null, emotion = null) => {
       cacheKey = "insight:trends";
     }
 
-    // 1️⃣ Check Redis Cache
-    const cachedInsight = await redisClient.get(cacheKey);
+    let cachedInsight = null;
+
+    if (redisClient) {
+      // 1️⃣ Check Redis Cache
+      cachedInsight = await redisClient.get(cacheKey);
+    }
 
     if (cachedInsight) {
       return JSON.parse(cachedInsight);
@@ -94,8 +98,10 @@ Return ONLY JSON:
 
     const insightData = JSON.parse(jsonString);
 
-    // 2️⃣ Save result to Redis cache (10 minutes)
-    await redisClient.setEx(cacheKey, 600, JSON.stringify(insightData));
+    if (redisClient) {
+      // 2️⃣ Save result to Redis cache (10 minutes)
+      await redisClient.setEx(cacheKey, 600, JSON.stringify(insightData));
+    }
 
     return insightData;
   } catch (error) {
